@@ -50,7 +50,7 @@
         {
           "id": "figma-references",
           "title": "Figma References",
-          "icon": "$(references)"
+          "icon": "$(symbol-color)"
         }
       ]
     },
