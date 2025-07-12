@@ -24,7 +24,8 @@ const JIRA_URL_PATTERN =
  * - https://github.com/owner/repo
  * - https://www.github.com/owner/repo
  */
-const GITHUB_URL_PATTERN = /github\.com\/([^\/]+)\/([^\/]+)/;
+const GITHUB_URL_PATTERN =
+  /^https?:\/\/(?:www\.)?github\.com\/([^\/]+)\/([^\/]+)/;
 
 /**
  * Extracts all Figma URLs from a given text

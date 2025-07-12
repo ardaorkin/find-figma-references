@@ -1,33 +1,46 @@
-import { describe, it, expect, spyOn, mock, jest } from "bun:test";
+import { describe, it, expect, spyOn, mock } from "bun:test";
 import * as vscode from "vscode";
 
 import { activate } from "./extension.ts";
 
-spyOn(vscode.commands, "registerCommand");
-spyOn(vscode.window, "showInformationMessage");
+// Mock VSCode modules
+const mockCommands = {
+  registerCommand: mock(() => ({ dispose: () => {} })),
+};
 
-const extensionContext: vscode.ExtensionContext = {
+const mockContext = {
   subscriptions: [],
+  extensionUri: { fsPath: "/test/path" },
 } as any;
+
+// Mock the vscode module
+mock.module("vscode", () => ({
+  commands: mockCommands,
+  window: {
+    activeTextEditor: undefined,
+    showErrorMessage: mock(() => Promise.resolve()),
+  },
+  ViewColumn: { One: 1 },
+}));
 
 describe("extension", () => {
   describe("activation", () => {
-    it("registers the hello world command", () => {
-      activate(extensionContext);
+    it("registers the find figma references command", () => {
+      activate(mockContext);
 
       expect(vscode.commands.registerCommand).toHaveBeenCalled();
-      const command = (vscode.commands.registerCommand as jest.Mock).mock
-        .calls[0][0];
-      const callback = (vscode.commands.registerCommand as jest.Mock).mock
-        .calls[0][1] as any as Function;
+      const command = (vscode.commands.registerCommand as any).mock.calls[0][0];
+      const callback = (vscode.commands.registerCommand as any).mock
+        .calls[0][1] as Function;
 
-      expect(command).toEqual("bun-vscode-extension.helloworld");
+      expect(command).toEqual("bun-vscode-extension.find-figma-references");
+      expect(typeof callback).toBe("function");
+    });
 
-      expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
-      callback();
-      expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-        "Hello World!"
-      );
+    it("adds command to subscriptions", () => {
+      mockContext.subscriptions = []; // Reset subscriptions
+      activate(mockContext);
+      expect(mockContext.subscriptions).toHaveLength(1);
     });
   });
 });

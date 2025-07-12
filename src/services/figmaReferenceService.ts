@@ -69,7 +69,7 @@ async function fetchPRDetailsForCommit(
  * const commitsWithFigma = filterCommitsWithFigmaUrls(commits);
  * ```
  */
-function filterCommitsWithFigmaUrls(commits: any[]): any[] {
+export function filterCommitsWithFigmaUrls(commits: any[]): any[] {
   return commits.filter(
     (commit) =>
       commit.prDetails &&
@@ -95,7 +95,9 @@ function filterCommitsWithFigmaUrls(commits: any[]): any[] {
  * // Returns: { prUrl: "...", author: "John Doe", figmaUrls: ["..."] }
  * ```
  */
-function transformToFigmaReferenceResult(commit: any): FigmaReferenceResult {
+export function transformToFigmaReferenceResult(
+  commit: any
+): FigmaReferenceResult {
   return {
     prUrl: commit.prUrl || "",
     author: commit.author || "",
