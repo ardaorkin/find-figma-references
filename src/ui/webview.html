@@ -11,68 +11,77 @@
             font-size: var(--vscode-font-size);
             color: var(--vscode-foreground);
             background-color: var(--vscode-editor-background);
-            padding: 20px;
+            padding: 16px;
             margin: 0;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--vscode-panel-border);
         }
 
         .title {
-            font-size: 1.5em;
-            font-weight: bold;
+            font-size: 1.2em;
+            font-weight: 600;
             color: var(--vscode-editor-foreground);
         }
 
         .refresh-btn {
-            background-color: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            background: transparent;
+            color: var(--vscode-descriptionForeground);
+            border: 1px solid var(--vscode-panel-border);
+            padding: 4px 8px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
+            transition: all 0.2s ease;
         }
 
         .refresh-btn:hover {
-            background-color: var(--vscode-button-hoverBackground);
+            background-color: var(--vscode-toolbar-hoverBackground);
+            border-color: var(--vscode-focusBorder);
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 24px;
             color: var(--vscode-descriptionForeground);
         }
 
         .error {
             text-align: center;
-            padding: 40px;
+            padding: 24px;
             color: var(--vscode-errorForeground);
         }
 
         .no-results {
             text-align: center;
-            padding: 40px;
+            padding: 24px;
             color: var(--vscode-descriptionForeground);
+        }
+
+        .presentation {
+            margin-bottom: 16px;
+            padding: 8px 0;
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.9em;
         }
 
         .result-item {
             background-color: var(--vscode-editor-background);
             border: 1px solid var(--vscode-panel-border);
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 12px;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
             transition: border-color 0.2s ease;
         }
 
@@ -83,8 +92,8 @@
         .pr-link {
             color: var(--vscode-textLink-foreground);
             text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
+            font-weight: 600;
+            font-size: 1em;
         }
 
         .pr-link:hover {
@@ -93,13 +102,13 @@
 
         .author {
             color: var(--vscode-descriptionForeground);
-            font-size: 0.9em;
-            margin-top: 4px;
+            font-size: 0.85em;
+            margin-top: 2px;
         }
 
         .figma-urls {
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 8px;
+            padding-top: 8px;
             border-top: 1px solid var(--vscode-panel-border);
         }
 
@@ -107,11 +116,11 @@
             display: inline-block;
             background-color: var(--vscode-badge-background);
             color: var(--vscode-badge-foreground);
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin: 2px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 1px;
             text-decoration: none;
-            font-size: 0.85em;
+            font-size: 0.8em;
         }
 
         .figma-url:hover {
@@ -123,8 +132,8 @@
             border: 2px solid var(--vscode-panel-border);
             border-top: 2px solid var(--vscode-progressBar-background);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
@@ -165,10 +174,10 @@
 
             switch (message.command) {
                 case 'updateResults':
-                    showResults(message.results);
+                    showResults(message.results, message.fileName);
                     break;
                 case 'showLoading':
-                    showLoading();
+                    showLoading(message.fileName);
                     break;
                 case 'showError':
                     showError(message.message);
@@ -179,13 +188,19 @@
             }
         });
 
-        function showResults(results) {
+        function showResults(results, fileName) {
             const content = document.getElementById('content');
 
             if (results.length === 0) {
                 content.innerHTML = '<div class="no-results"><p>No Figma references found for this file.</p></div>';
                 return;
             }
+
+            const presentationText = `
+                <div class="presentation">
+                    <p>Found ${results.length} pull request${results.length > 1 ? 's' : ''} with Figma references for <strong>${fileName}</strong>:</p>
+                </div>
+            `;
 
             const resultsHtml = results.map(result => {
                 const figmaUrlsHtml = result.figmaUrls.map(url =>
@@ -204,15 +219,15 @@
                 `;
             }).join('');
 
-            content.innerHTML = resultsHtml;
+            content.innerHTML = presentationText + resultsHtml;
         }
 
-        function showLoading() {
+        function showLoading(fileName) {
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Loading Figma references...</p>
+                    <p>Loading Figma references for <strong>${fileName}</strong>...</p>
                 </div>
             `;
         }
