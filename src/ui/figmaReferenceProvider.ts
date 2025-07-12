@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import type { FigmaReferenceResult } from "../types";
+import { getCurrentFilePath } from "../utils/vscodeUtils";
+import { findFigmaReferences } from "../services/figmaReferenceService";
 
 /**
  * Provider for the Figma References Webview
@@ -9,9 +11,94 @@ import type { FigmaReferenceResult } from "../types";
  * This class manages the webview that displays Figma references
  * in a dedicated panel in the Activity Bar.
  */
-export class FigmaReferenceProvider {
+export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "figmaReferencesView";
   private _panel: vscode.WebviewPanel | undefined = undefined;
+  private _view: vscode.WebviewView | undefined = undefined;
+  private _extensionUri: vscode.Uri | undefined = undefined;
+
+  /**
+   * Sets the extension URI for the provider
+   *
+   * @param extensionUri - The URI of the extension
+   */
+  public setExtensionUri(extensionUri: vscode.Uri): void {
+    this._extensionUri = extensionUri;
+  }
+
+  /**
+   * Resolves the webview view for the activity bar panel
+   *
+   * This method is called by VSCode when the webview view needs to be created.
+   * It sets up the webview with the appropriate HTML content and message handling.
+   *
+   * @param webviewView - The webview view to resolve
+   * @param context - The webview view resolve context
+   * @param token - The cancellation token
+   */
+  public async resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    _context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ): Promise<void> {
+    this._view = webviewView;
+
+    if (!this._extensionUri) {
+      console.error("Extension URI not set");
+      return;
+    }
+
+    // Set the webview options
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this._extensionUri],
+    };
+
+    // Set the initial HTML content
+    webviewView.webview.html = this._getHtmlForWebview(
+      webviewView.webview,
+      this._extensionUri
+    );
+
+    // Show loading and fetch references
+    const filePath = getCurrentFilePath();
+    const fileName = filePath
+      ? filePath.split("/").pop() || filePath
+      : "this file";
+    this.showLoading(fileName);
+    await this.refresh();
+
+    // Handle messages from the webview
+    webviewView.webview.onDidReceiveMessage((message) => {
+      switch (message.command) {
+        case "refresh":
+          this.refresh();
+          break;
+      }
+    });
+  }
+
+  /**
+   * Refreshes the Figma references for the current file and updates the view
+   */
+  public async refresh(): Promise<void> {
+    const filePath = getCurrentFilePath();
+    if (filePath) {
+      try {
+        const results = await findFigmaReferences({ filePath });
+        const fileName = filePath.split("/").pop() || filePath;
+        if (results.length === 0) {
+          this.showNoResults("No Figma references found for this file");
+        } else {
+          this.updateContent(results, fileName);
+        }
+      } catch (error) {
+        this.showError(`Error finding Figma references: ${error}`);
+      }
+    } else {
+      this.showNoResults("No file is currently open");
+    }
+  }
 
   /**
    * Creates or shows the Figma References panel
@@ -64,18 +151,23 @@ export class FigmaReferenceProvider {
    * Updates the content of the webview with Figma reference results
    *
    * @param results - Array of Figma reference results to display
+   * @param fileName - The name of the current file
    *
    * @example
    * ```typescript
    * const results = [{ prUrl: "...", author: "John", figmaUrls: ["..."] }];
-   * provider.updateContent(results);
+   * provider.updateContent(results, "src/components/Button.tsx");
    * ```
    */
-  public updateContent(results: FigmaReferenceResult[]): void {
-    if (this._panel) {
-      this._panel.webview.postMessage({
+  public updateContent(
+    results: FigmaReferenceResult[],
+    fileName?: string
+  ): void {
+    if (this._view) {
+      this._view.webview.postMessage({
         command: "updateResults",
         results: results,
+        fileName: fileName || "this file",
       });
     }
   }
@@ -83,15 +175,17 @@ export class FigmaReferenceProvider {
   /**
    * Shows a loading state in the webview
    *
+   * @param fileName - The name of the current file
    * @example
    * ```typescript
-   * provider.showLoading();
+   * provider.showLoading("Button.tsx");
    * ```
    */
-  public showLoading(): void {
-    if (this._panel) {
-      this._panel.webview.postMessage({
+  public showLoading(fileName?: string): void {
+    if (this._view) {
+      this._view.webview.postMessage({
         command: "showLoading",
+        fileName: fileName || "this file",
       });
     }
   }
@@ -107,8 +201,8 @@ export class FigmaReferenceProvider {
    * ```
    */
   public showError(message: string): void {
-    if (this._panel) {
-      this._panel.webview.postMessage({
+    if (this._view) {
+      this._view.webview.postMessage({
         command: "showError",
         message: message,
       });
@@ -126,8 +220,8 @@ export class FigmaReferenceProvider {
    * ```
    */
   public showNoResults(message: string): void {
-    if (this._panel) {
-      this._panel.webview.postMessage({
+    if (this._view) {
+      this._view.webview.postMessage({
         command: "showNoResults",
         message: message,
       });
