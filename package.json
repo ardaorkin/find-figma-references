@@ -29,7 +29,7 @@
   "displayName": "Figma References",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOURNAME"
+    "url": "https://github.com/ardaorkin/find-figma-references"
   },
   "contributes": {
     "commands": [
