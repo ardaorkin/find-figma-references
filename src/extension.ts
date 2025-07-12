@@ -1,19 +1,16 @@
 import * as vscode from "vscode";
 import { findFigmaReferences } from "./services/figmaReferenceService";
-import {
-  getCurrentFilePath,
-  showTextDocument,
-  showErrorMessage,
-  showInformationMessage,
-} from "./utils/vscodeUtils";
+import { getCurrentFilePath, showErrorMessage } from "./utils/vscodeUtils";
+import { FigmaReferenceProvider } from "./ui/figmaReferenceProvider";
 
 /**
  * Main command handler for finding Figma references in git history
  *
  * This function is called when the user executes the "Find Figma References" command.
  * It gets the current file path, finds Figma references in its git history,
- * and displays the results in a new text document.
+ * and displays the results in a dedicated webview panel.
  *
+ * @param context - The extension context
  * @returns Promise that resolves when the command execution is complete
  *
  * @example
@@ -22,7 +19,9 @@ import {
  * // and called automatically when the user triggers the command
  * ```
  */
-async function handleFindFigmaReferences(): Promise<void> {
+async function handleFindFigmaReferences(
+  context: vscode.ExtensionContext
+): Promise<void> {
   const currentFilePath = getCurrentFilePath();
 
   if (!currentFilePath) {
@@ -30,18 +29,24 @@ async function handleFindFigmaReferences(): Promise<void> {
     return;
   }
 
-  try {
-    const result = await findFigmaReferences({ filePath: currentFilePath });
+  // Create or show the Figma References panel
+  const provider = new FigmaReferenceProvider();
+  const panel = provider.createOrShow(context.extensionUri);
 
-    if (!result.trim()) {
-      await showInformationMessage("No git history found for this file");
+  // Show loading state
+  provider.showLoading();
+
+  try {
+    const results = await findFigmaReferences({ filePath: currentFilePath });
+
+    if (results.length === 0) {
+      provider.showNoResults("No Figma references found for this file");
       return;
     }
 
-    // Create and show a new document with the results
-    await showTextDocument(result, "plaintext");
+    provider.updateContent(results);
   } catch (error) {
-    await showErrorMessage(`Error finding Figma references: ${error}`);
+    provider.showError(`Error finding Figma references: ${error}`);
   }
 }
 
@@ -65,7 +70,7 @@ export const activate = (context: vscode.ExtensionContext) => {
   // Register the command to find Figma references
   const disposable = vscode.commands.registerCommand(
     "bun-vscode-extension.find-figma-references",
-    handleFindFigmaReferences
+    () => handleFindFigmaReferences(context)
   );
 
   // Add the command to the extension's subscriptions

@@ -44,6 +44,24 @@
           "command": "bun-vscode-extension.find-figma-references"
         }
       ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "figma-references",
+          "title": "Figma References",
+          "icon": "$(references)"
+        }
+      ]
+    },
+    "views": {
+      "figma-references": [
+        {
+          "id": "figmaReferencesView",
+          "name": "Figma References",
+          "type": "webview"
+        }
+      ]
     }
   },
   "engines": {

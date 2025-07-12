@@ -104,39 +104,10 @@ function transformToFigmaReferenceResult(commit: any): FigmaReferenceResult {
 }
 
 /**
- * Formats Figma reference results into a readable string
- *
- * @param results - Array of Figma reference results
- * @returns Formatted string representation of the results
- *
- * @example
- * ```typescript
- * const results = [
- *   { prUrl: "https://github.com/owner/repo/pull/123", author: "John", figmaUrls: ["https://figma.com/file/abc"] }
- * ];
- * const formatted = formatFigmaReferenceResults(results);
- * ```
- */
-function formatFigmaReferenceResults(results: FigmaReferenceResult[]): string {
-  if (results.length === 0) {
-    return "No commits with Figma URLs found for this file.";
-  }
-
-  return results
-    .map(
-      (result) =>
-        `PR: ${result.prUrl} | Author: ${
-          result.author
-        } | Figma URLs: ${result.figmaUrls.join(", ")}`
-    )
-    .join("\n");
-}
-
-/**
  * Main function to find Figma references in git history for a file
  *
  * @param params - Parameters for finding Figma references
- * @returns Promise resolving to formatted string of Figma references found
+ * @returns Promise resolving to array of FigmaReferenceResult objects
  *
  * @example
  * ```typescript
@@ -147,13 +118,13 @@ function formatFigmaReferenceResults(results: FigmaReferenceResult[]): string {
  */
 export async function findFigmaReferences(
   params: FindFigmaReferencesParams
-): Promise<string> {
+): Promise<FigmaReferenceResult[]> {
   try {
     // Get git history for the file
     const commits = await getGitHistory(params.filePath);
 
     if (commits.length === 0) {
-      return "No git history found for this file.";
+      return [];
     }
 
     // Process each commit to fetch PR details
@@ -183,8 +154,7 @@ export async function findFigmaReferences(
     // Transform to result format
     const results = commitsWithFigma.map(transformToFigmaReferenceResult);
 
-    // Format the results
-    return formatFigmaReferenceResults(results);
+    return results;
   } catch (error) {
     throw new Error(`Failed to find Figma references: ${error}`);
   }

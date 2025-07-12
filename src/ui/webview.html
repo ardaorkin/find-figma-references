@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma References</title>
+    <style>
+        body {
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--vscode-editor-foreground);
+        }
+
+        .refresh-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .refresh-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: var(--vscode-errorForeground);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        .result-item {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s ease;
+        }
+
+        .result-item:hover {
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .pr-link {
+            color: var(--vscode-textLink-foreground);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .pr-link:hover {
+            text-decoration: underline;
+        }
+
+        .author {
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+
+        .figma-urls {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--vscode-panel-border);
+        }
+
+        .figma-url {
+            display: inline-block;
+            background-color: var(--vscode-badge-background);
+            color: var(--vscode-badge-foreground);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            text-decoration: none;
+            font-size: 0.85em;
+        }
+
+        .figma-url:hover {
+            background-color: var(--vscode-badge-background);
+            opacity: 0.8;
+        }
+
+        .spinner {
+            border: 2px solid var(--vscode-panel-border);
+            border-top: 2px solid var(--vscode-progressBar-background);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Figma References</div>
+            <button class="refresh-btn" onclick="refreshResults()">Refresh</button>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading Figma references...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        // Handle messages from the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+
+            switch (message.command) {
+                case 'updateResults':
+                    showResults(message.results);
+                    break;
+                case 'showLoading':
+                    showLoading();
+                    break;
+                case 'showError':
+                    showError(message.message);
+                    break;
+                case 'showNoResults':
+                    showNoResults(message.message);
+                    break;
+            }
+        });
+
+        function showResults(results) {
+            const content = document.getElementById('content');
+
+            if (results.length === 0) {
+                content.innerHTML = '<div class="no-results"><p>No Figma references found for this file.</p></div>';
+                return;
+            }
+
+            const resultsHtml = results.map(result => {
+                const figmaUrlsHtml = result.figmaUrls.map(url =>
+                    `<a href="${url}" class="figma-url" target="_blank">${url}</a>`
+                ).join('');
+
+                return `
+                    <div class="result-item">
+                        <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
+                        <div class="author">Author: ${result.author}</div>
+                        <div class="figma-urls">
+                            <strong>Figma URLs:</strong><br>
+                            ${figmaUrlsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            content.innerHTML = resultsHtml;
+        }
+
+        function showLoading() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading Figma references...</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="error">
+                    <p>Error: ${message}</p>
+                </div>
+            `;
+        }
+
+        function showNoResults(message) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="no-results">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function refreshResults() {
+            vscode.postMessage({
+                command: 'refresh'
+            });
+        }
+    </script>
+</body>
+
+</html>
