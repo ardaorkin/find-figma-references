@@ -10,7 +10,7 @@ import { FigmaReferenceProvider } from "./ui/figmaReferenceProvider";
  * It gets the current file path, finds Figma references in its git history,
  * and displays the results in a dedicated webview panel.
  *
- * @param context - The extension context
+ * @param provider - The Figma reference provider instance
  * @returns Promise that resolves when the command execution is complete
  *
  * @example
@@ -20,7 +20,7 @@ import { FigmaReferenceProvider } from "./ui/figmaReferenceProvider";
  * ```
  */
 async function handleFindFigmaReferences(
-  context: vscode.ExtensionContext
+  provider: FigmaReferenceProvider
 ): Promise<void> {
   const currentFilePath = getCurrentFilePath();
 
@@ -29,22 +29,20 @@ async function handleFindFigmaReferences(
     return;
   }
 
-  // Create or show the Figma References panel
-  const provider = new FigmaReferenceProvider();
-  const panel = provider.createOrShow(context.extensionUri);
-
   // Show loading state
-  provider.showLoading();
+  const fileName = currentFilePath.split("/").pop() || currentFilePath;
+  provider.showLoading(fileName);
 
   try {
     const results = await findFigmaReferences({ filePath: currentFilePath });
+    const fileName = currentFilePath.split("/").pop() || currentFilePath;
 
     if (results.length === 0) {
       provider.showNoResults("No Figma references found for this file");
       return;
     }
 
-    provider.updateContent(results);
+    provider.updateContent(results, fileName);
   } catch (error) {
     provider.showError(`Error finding Figma references: ${error}`);
   }
@@ -54,7 +52,8 @@ async function handleFindFigmaReferences(
  * Activates the extension
  *
  * This function is called when the extension is activated. It registers
- * the command that allows users to find Figma references in git history.
+ * the command that allows users to find Figma references in git history
+ * and sets up the webview provider for the activity bar panel.
  *
  * @param context - The extension context provided by VSCode
  *
@@ -67,14 +66,27 @@ async function handleFindFigmaReferences(
  * ```
  */
 export const activate = (context: vscode.ExtensionContext) => {
-  // Register the command to find Figma references
-  const disposable = vscode.commands.registerCommand(
-    "bun-vscode-extension.find-figma-references",
-    () => handleFindFigmaReferences(context)
+  // Register the webview provider for the activity bar panel
+  const provider = new FigmaReferenceProvider();
+  provider.setExtensionUri(context.extensionUri);
+  const webviewProviderDisposable = vscode.window.registerWebviewViewProvider(
+    "figmaReferencesView",
+    provider
   );
 
-  // Add the command to the extension's subscriptions
-  context.subscriptions.push(disposable);
+  // Register the command to find Figma references
+  const commandDisposable = vscode.commands.registerCommand(
+    "bun-vscode-extension.find-figma-references",
+    () => handleFindFigmaReferences(provider)
+  );
+
+  // Add all disposables to the extension's subscriptions
+  context.subscriptions.push(commandDisposable, webviewProviderDisposable);
+
+  // Listen for active editor changes and refresh the view
+  vscode.window.onDidChangeActiveTextEditor(() => {
+    provider.refresh();
+  });
 };
 
 /**
