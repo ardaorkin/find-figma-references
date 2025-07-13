@@ -34,15 +34,24 @@ async function handleFindFigmaReferences(
   provider.showLoading(fileName);
 
   try {
-    const results = await findFigmaReferences({ filePath: currentFilePath });
-    const fileName = currentFilePath.split("/").pop() || currentFilePath;
+    const results = await findFigmaReferences({
+      filePath: currentFilePath,
+      onResultFound: (result) => {
+        // Stream results as they're found
+        provider.addResult(result, fileName);
+      },
+      onProgress: (processed, total) => {
+        // Update progress indicator
+        provider.updateProgress(processed, total);
+      },
+    });
+
+    // Remove loading state and show final results
+    provider.finishLoading(fileName);
 
     if (results.length === 0) {
       provider.showNoResults("No Figma references found for this file");
-      return;
     }
-
-    provider.updateContent(results, fileName);
   } catch (error) {
     provider.showError(`Error finding Figma references: ${error}`);
   }
