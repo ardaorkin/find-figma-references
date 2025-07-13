@@ -51,10 +51,7 @@
         {
           "id": "figma-references",
           "title": "Figma References",
-          "icon": {
-            "light": "./assets/light_icon.png",
-            "dark": "./assets/dark_icon.png"
-          }
+          "icon": "./assets/activity_bar_find_figma_reference.svg"
         }
       ]
     },
