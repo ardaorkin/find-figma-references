@@ -19,6 +19,8 @@ mock.module("vscode", () => ({
   window: {
     activeTextEditor: undefined,
     showErrorMessage: mock(() => Promise.resolve()),
+    registerWebviewViewProvider: mock(() => ({ dispose: () => {} })),
+    onDidChangeActiveTextEditor: mock(() => ({ dispose: () => {} })),
   },
   ViewColumn: { One: 1 },
 }));
@@ -40,7 +42,7 @@ describe("extension", () => {
     it("adds command to subscriptions", () => {
       mockContext.subscriptions = []; // Reset subscriptions
       activate(mockContext);
-      expect(mockContext.subscriptions).toHaveLength(1);
+      expect(mockContext.subscriptions).toHaveLength(2); // Command + Webview Provider
     });
   });
 });
