@@ -13,10 +13,7 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "icon": {
-    "light": "./assets/light_icon.png",
-    "dark": "./assets/dark_icon.png"
-  },
+  "icon": "./assets/icon.png",
   "type": "module",
   "scripts": {
     "dev": "echo 'Open this directory in VSCode and then run your extension with F5 or `Run and Debug > Run Extension`!'",
