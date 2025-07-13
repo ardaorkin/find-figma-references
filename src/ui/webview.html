@@ -138,6 +138,27 @@
             margin: 0 auto;
         }
 
+        .progress {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--vscode-panel-border);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--vscode-progressBar-background);
+            transition: width 0.3s ease;
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -168,6 +189,10 @@
     <script>
         const vscode = acquireVsCodeApi();
 
+        // Global state for streaming results
+        let currentResults = [];
+        let currentFileName = '';
+
         // Handle messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
@@ -175,6 +200,15 @@
             switch (message.command) {
                 case 'updateResults':
                     showResults(message.results, message.fileName);
+                    break;
+                case 'addResult':
+                    addResult(message.result, message.fileName);
+                    break;
+                case 'updateProgress':
+                    updateProgress(message.processed, message.total);
+                    break;
+                case 'finishLoading':
+                    finishLoading(message.fileName);
                     break;
                 case 'showLoading':
                     showLoading(message.fileName);
@@ -224,12 +258,138 @@
 
         function showLoading(fileName) {
             const content = document.getElementById('content');
+            currentResults = [];
+            currentFileName = fileName;
             content.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>Loading Figma references for <strong>${fileName}</strong>...</p>
+                    <div class="progress">
+                        <div>Processing commits...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="results-container"></div>
+            `;
+        }
+
+        function addResult(result, fileName) {
+            currentResults.push(result);
+            currentFileName = fileName;
+
+            // Update the results display while keeping the loading state
+            const content = document.getElementById('content');
+            const loadingDiv = content.querySelector('.loading');
+
+            if (loadingDiv) {
+                // Keep the loading state but add results below it
+                const resultsContainer = content.querySelector('.results-container') || createResultsContainer();
+                updateResultsInContainer(resultsContainer);
+            } else {
+                // If no loading state, update the full display
+                updateResultsDisplay();
+            }
+        }
+
+        function createResultsContainer() {
+            const content = document.getElementById('content');
+            const resultsContainer = document.createElement('div');
+            resultsContainer.className = 'results-container';
+            content.appendChild(resultsContainer);
+            return resultsContainer;
+        }
+
+        function updateResultsInContainer(container) {
+            if (currentResults.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const presentationText = `
+                <div class="presentation">
+                    <p>Found ${currentResults.length} pull request${currentResults.length > 1 ? 's' : ''} with Figma references for <strong>${currentFileName}</strong>:</p>
                 </div>
             `;
+
+            const resultsHtml = currentResults.map(result => {
+                const figmaUrlsHtml = result.figmaUrls.map(url =>
+                    `<a href="${url}" class="figma-url" target="_blank">${url}</a>`
+                ).join('');
+
+                return `
+                    <div class="result-item">
+                        <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
+                        <div class="author">Author: ${result.author}</div>
+                        <div class="figma-urls">
+                            <strong>Figma URLs:</strong><br>
+                            ${figmaUrlsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = presentationText + resultsHtml;
+        }
+
+        function finishLoading(fileName) {
+            const content = document.getElementById('content');
+            const loadingDiv = content.querySelector('.loading');
+            const resultsContainer = content.querySelector('.results-container');
+
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+
+            if (resultsContainer && currentResults.length > 0) {
+                // Move results to main content area
+                content.innerHTML = resultsContainer.innerHTML;
+            } else if (currentResults.length === 0) {
+                content.innerHTML = '<div class="no-results"><p>No Figma references found for this file.</p></div>';
+            }
+        }
+
+        function updateProgress(processed, total) {
+            const progressFill = document.querySelector('.progress-fill');
+            if (progressFill) {
+                const percentage = Math.round((processed / total) * 100);
+                progressFill.style.width = percentage + '%';
+            }
+        }
+
+        function updateResultsDisplay() {
+            const content = document.getElementById('content');
+
+            if (currentResults.length === 0) {
+                content.innerHTML = '<div class="no-results"><p>No Figma references found for this file.</p></div>';
+                return;
+            }
+
+            const presentationText = `
+                <div class="presentation">
+                    <p>Found ${currentResults.length} pull request${currentResults.length > 1 ? 's' : ''} with Figma references for <strong>${currentFileName}</strong>:</p>
+                </div>
+            `;
+
+            const resultsHtml = currentResults.map(result => {
+                const figmaUrlsHtml = result.figmaUrls.map(url =>
+                    `<a href="${url}" class="figma-url" target="_blank">${url}</a>`
+                ).join('');
+
+                return `
+                    <div class="result-item">
+                        <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
+                        <div class="author">Author: ${result.author}</div>
+                        <div class="figma-urls">
+                            <strong>Figma URLs:</strong><br>
+                            ${figmaUrlsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            content.innerHTML = presentationText + resultsHtml;
         }
 
         function showError(message) {
