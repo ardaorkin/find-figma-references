@@ -23,7 +23,7 @@
     "clean": "rm -r ./dist"
   },
   "//": "START EXTENSION ATTRIBUTES",
-  "name": "hover-for-figma",
+  "name": "find-figma-references",
   "version": "0.0.2",
   "description": "Find Figma references in GitHub PRs for the current file",
   "displayName": "Figma References",
