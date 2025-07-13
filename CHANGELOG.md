@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.9] - 2024-07-13
+### Changed
+- Updated activity bar icon to use SVG format for better scaling and theme integration.
+
 ## [0.0.8] - 2024-07-13
 ### Changed
 - Configure theme-specific activity bar icons for light and dark themes.
