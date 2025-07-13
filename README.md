@@ -212,7 +212,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### v0.0.2 (Unreleased)
+### v0.0.3 (Latest)
+- **GitHub Token UI**: Added built-in token input in the extension panel
+- **Configuration Management**: Extension-specific configuration name (`figmaReferences.githubToken`)
+- **Improved Error Handling**: Better error messages and token validation
+- **Auto-refresh**: Automatic refresh after token is saved
+- **Enhanced UX**: Token input appears when needed, disappears when configured
+- **No Loading Confusion**: Prevents loading indicator when token is missing
+
+### v0.0.2
 - **Performance Improvements**: Chunked processing and streaming results
 - **Responsive Design**: Fixed text overflow in narrow containers
 - **UI Enhancements**: Figma links prioritized over GitHub PR links
