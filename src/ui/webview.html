@@ -124,6 +124,12 @@
         }
 
         .figma-urls {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+        }
+
+        .pr-info {
             margin-top: 8px;
             padding-top: 8px;
             border-top: 1px solid var(--vscode-panel-border);
@@ -263,11 +269,13 @@
 
                 return `
                     <div class="result-item">
-                        <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
-                        <div class="author">Author: ${result.author}</div>
                         <div class="figma-urls">
                             <strong>Figma URLs:</strong><br>
                             ${figmaUrlsHtml}
+                        </div>
+                        <div class="pr-info">
+                            <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
+                            <div class="author">Author: ${result.author}</div>
                         </div>
                     </div>
                 `;
@@ -340,11 +348,13 @@
 
                 return `
                     <div class="result-item">
-                        <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
-                        <div class="author">Author: ${result.author}</div>
                         <div class="figma-urls">
                             <strong>Figma URLs:</strong><br>
                             ${figmaUrlsHtml}
+                        </div>
+                        <div class="pr-info">
+                            <a href="${result.prUrl}" class="pr-link" target="_blank">${result.prUrl}</a>
+                            <div class="author">Author: ${result.author}</div>
                         </div>
                     </div>
                 `;
