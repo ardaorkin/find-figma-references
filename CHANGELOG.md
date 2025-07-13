@@ -1,6 +1,8 @@
 # Changelog
 
 ## [0.0.7] - 2024-07-13
+### Added
+- Theme-specific icons: light and dark theme support for better visual integration.
 ### Changed
 - Updated extension icon for better visual identification.
 
