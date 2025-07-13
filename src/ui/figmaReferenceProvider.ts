@@ -348,6 +348,10 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
           success: true,
         });
       }
+      // Automatically refresh after successful token save
+      setTimeout(() => {
+        this.refresh();
+      }, 1000); // Small delay to ensure token is saved
     } catch (error) {
       if (this._view) {
         this._view.webview.postMessage({

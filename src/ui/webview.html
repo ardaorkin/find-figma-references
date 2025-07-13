@@ -593,12 +593,9 @@
             saveBtn.textContent = 'Save Token';
 
             if (success) {
-                showTokenStatus('Token saved successfully!', 'success');
+                showTokenStatus('Token saved successfully! Refreshing...', 'success');
                 tokenInput.value = '';
-                // Hide token section after successful save
-                setTimeout(() => {
-                    document.getElementById('token-section').style.display = 'none';
-                }, 2000);
+                // Don't hide token section immediately - let the refresh handle it
             } else {
                 showTokenStatus('Failed to save token: ' + error, 'error');
             }
