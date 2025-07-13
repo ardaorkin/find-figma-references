@@ -13,11 +13,14 @@
             background-color: var(--vscode-editor-background);
             padding: 16px;
             margin: 0;
+            min-width: 0;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 100%;
             margin: 0;
+            min-width: 0;
         }
 
         .header {
@@ -27,12 +30,17 @@
             margin-bottom: 16px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--vscode-panel-border);
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .title {
             font-size: 1.2em;
             font-weight: 600;
             color: var(--vscode-editor-foreground);
+            word-break: break-word;
+            flex: 1;
+            min-width: 0;
         }
 
         .refresh-btn {
@@ -44,6 +52,8 @@
             cursor: pointer;
             font-size: 11px;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .refresh-btn:hover {
@@ -74,6 +84,7 @@
             padding: 8px 0;
             color: var(--vscode-descriptionForeground);
             font-size: 0.9em;
+            word-break: break-word;
         }
 
         .result-item {
@@ -83,6 +94,8 @@
             padding: 12px;
             margin-bottom: 8px;
             transition: border-color 0.2s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .result-item:hover {
@@ -94,6 +107,9 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 1em;
+            word-break: break-all;
+            display: block;
+            margin-bottom: 4px;
         }
 
         .pr-link:hover {
@@ -104,6 +120,7 @@
             color: var(--vscode-descriptionForeground);
             font-size: 0.85em;
             margin-top: 2px;
+            word-break: break-word;
         }
 
         .figma-urls {
@@ -121,6 +138,9 @@
             margin: 1px;
             text-decoration: none;
             font-size: 0.8em;
+            word-break: break-all;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .figma-url:hover {
