@@ -8,7 +8,29 @@ import { getPRDetails } from "./githubService";
 interface FindFigmaReferencesParams {
   /** The file path to search for Figma references */
   filePath: string;
+  /** Callback function to handle results as they're found */
+  onResultFound?: (result: FigmaReferenceResult) => void;
+  /** Callback function to update loading progress */
+  onProgress?: (processed: number, total: number) => void;
 }
+
+/**
+ * Configuration for chunked processing
+ */
+interface ChunkConfig {
+  /** Number of commits to process in each chunk */
+  chunkSize: number;
+  /** Delay between chunks in milliseconds */
+  chunkDelay: number;
+}
+
+/**
+ * Default chunk configuration
+ */
+const DEFAULT_CHUNK_CONFIG: ChunkConfig = {
+  chunkSize: 5,
+  chunkDelay: 100,
+};
 
 /**
  * Fetches PR details for a commit if it has a PR number
@@ -106,6 +128,101 @@ export function transformToFigmaReferenceResult(
 }
 
 /**
+ * Processes a single commit and returns Figma reference result if found
+ *
+ * @param commit - The commit to process
+ * @param repoInfo - Repository information
+ * @returns Promise resolving to FigmaReferenceResult if found, null otherwise
+ *
+ * @example
+ * ```typescript
+ * const commit = { prNumber: "123", ... };
+ * const repoInfo = { owner: "owner", repo: "repo" };
+ * const result = await processSingleCommit(commit, repoInfo);
+ * ```
+ */
+async function processSingleCommit(
+  commit: any,
+  repoInfo: { owner: string; repo: string } | null
+): Promise<FigmaReferenceResult | null> {
+  if (!commit.prNumber) {
+    return null;
+  }
+
+  const prDetails = await fetchPRDetailsForCommit(commit, repoInfo);
+  if (!prDetails || !prDetails.figmaUrls || prDetails.figmaUrls.length === 0) {
+    return null;
+  }
+
+  return transformToFigmaReferenceResult({ ...commit, prDetails });
+}
+
+/**
+ * Processes commits in chunks with delay between chunks
+ *
+ * @param commits - Array of commits to process
+ * @param repoInfo - Repository information
+ * @param config - Chunk configuration
+ * @param onResultFound - Callback for when a result is found
+ * @param onProgress - Callback for progress updates
+ * @returns Promise resolving to array of all found results
+ *
+ * @example
+ * ```typescript
+ * const commits = [commit1, commit2, ...];
+ * const repoInfo = { owner: "owner", repo: "repo" };
+ * const results = await processCommitsInChunks(commits, repoInfo, config, onResult, onProgress);
+ * ```
+ */
+async function processCommitsInChunks(
+  commits: any[],
+  repoInfo: { owner: string; repo: string } | null,
+  config: ChunkConfig,
+  onResultFound?: (result: FigmaReferenceResult) => void,
+  onProgress?: (processed: number, total: number) => void
+): Promise<FigmaReferenceResult[]> {
+  const results: FigmaReferenceResult[] = [];
+  const total = commits.length;
+  let processed = 0;
+
+  // Process commits in chunks
+  for (let i = 0; i < commits.length; i += config.chunkSize) {
+    const chunk = commits.slice(i, i + config.chunkSize);
+
+    // Process all commits in the current chunk concurrently
+    const chunkPromises = chunk.map(async (commit) => {
+      const result = await processSingleCommit(commit, repoInfo);
+      processed++;
+
+      if (onProgress) {
+        onProgress(processed, total);
+      }
+
+      return result;
+    });
+
+    const chunkResults = await Promise.all(chunkPromises);
+
+    // Add found results and trigger callbacks
+    for (const result of chunkResults) {
+      if (result) {
+        results.push(result);
+        if (onResultFound) {
+          onResultFound(result);
+        }
+      }
+    }
+
+    // Add delay between chunks (except for the last chunk)
+    if (i + config.chunkSize < commits.length) {
+      await new Promise((resolve) => setTimeout(resolve, config.chunkDelay));
+    }
+  }
+
+  return results;
+}
+
+/**
  * Main function to find Figma references in git history for a file
  *
  * @param params - Parameters for finding Figma references
@@ -129,32 +246,23 @@ export async function findFigmaReferences(
       return [];
     }
 
-    // Process each commit to fetch PR details
-    const commitsWithPRDetails = await Promise.all(
-      commits.map(async (commit) => {
-        if (commit.prNumber) {
-          // Extract repo info from the commit's prUrl
-          const repoInfo = commit.prUrl
-            ? {
-                owner: commit.prUrl.split("/")[3],
-                repo: commit.prUrl.split("/")[4],
-              }
-            : null;
-
-          const prDetails = await fetchPRDetailsForCommit(commit, repoInfo);
-          if (prDetails) {
-            return { ...commit, prDetails };
-          }
+    // Extract repo info from the first commit that has a PR URL
+    const commitWithPR = commits.find((commit) => commit.prUrl);
+    const repoInfo = commitWithPR?.prUrl
+      ? {
+          owner: commitWithPR.prUrl.split("/")[3],
+          repo: commitWithPR.prUrl.split("/")[4],
         }
-        return commit;
-      })
+      : null;
+
+    // Process commits in chunks with streaming results
+    const results = await processCommitsInChunks(
+      commits,
+      repoInfo,
+      DEFAULT_CHUNK_CONFIG,
+      params.onResultFound,
+      params.onProgress
     );
-
-    // Filter commits that have Figma URLs
-    const commitsWithFigma = filterCommitsWithFigmaUrls(commitsWithPRDetails);
-
-    // Transform to result format
-    const results = commitsWithFigma.map(transformToFigmaReferenceResult);
 
     return results;
   } catch (error) {
