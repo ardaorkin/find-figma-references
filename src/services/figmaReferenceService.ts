@@ -63,6 +63,13 @@ async function fetchPRDetailsForCommit(
 
     return prDetails;
   } catch (error) {
+    // Re-throw token-related errors to be handled at the top level
+    if (
+      error instanceof Error &&
+      error.message.includes("GitHub token not found")
+    ) {
+      throw error;
+    }
     return null;
   }
 }

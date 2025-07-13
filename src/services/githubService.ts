@@ -46,14 +46,7 @@ export function getGitHubToken(): string | null {
 
   const token = envToken || configToken;
 
-  if (!token) {
-    vscode.window.showWarningMessage(
-      "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure github.token in VSCode settings."
-    );
-    return null;
-  }
-
-  return token;
+  return token || null;
 }
 
 /**
@@ -185,7 +178,9 @@ export async function getPRDetails(
 ): Promise<PRDetails | null> {
   const token = getGitHubToken();
   if (!token) {
-    return null;
+    throw new Error(
+      "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure github.token in VSCode settings."
+    );
   }
 
   const config: GitHubConfig = {

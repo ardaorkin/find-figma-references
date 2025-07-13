@@ -53,7 +53,19 @@ async function handleFindFigmaReferences(
       provider.showNoResults("No Figma references found for this file");
     }
   } catch (error) {
-    provider.showError(`Error finding Figma references: ${error}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Check if the error is related to missing GitHub token
+    if (
+      errorMessage.includes("GitHub token not found") ||
+      errorMessage.includes("GITHUB_TOKEN")
+    ) {
+      provider.showError(
+        "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure github.token in VSCode settings."
+      );
+    } else {
+      provider.showError(`Error finding Figma references: ${errorMessage}`);
+    }
   }
 }
 
