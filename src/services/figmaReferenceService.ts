@@ -55,26 +55,14 @@ async function fetchPRDetailsForCommit(
   }
 
   try {
-    console.log("[Figma Reference Service] Fetching PR details...");
     const prDetails = await getPRDetails(
       repoInfo.owner,
       repoInfo.repo,
       commit.prNumber
     );
 
-    if (prDetails) {
-      console.log(
-        "[Figma Reference Service] PR details:",
-        JSON.stringify({ prDetails })
-      );
-    }
-
     return prDetails;
   } catch (error) {
-    console.error(
-      "[Figma Reference Service] Error fetching PR details:",
-      error
-    );
     return null;
   }
 }
@@ -232,7 +220,6 @@ async function processCommitsInChunks(
  * ```typescript
  * const params = { filePath: '/path/to/file.ts' };
  * const result = await findFigmaReferences(params);
- * console.log(result);
  * ```
  */
 export async function findFigmaReferences(

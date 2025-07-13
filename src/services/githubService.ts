@@ -111,7 +111,6 @@ export async function fetchRawPRData(
 
     return response.data;
   } catch (error) {
-    console.error("[GitHub Service] Error fetching PR data:", error);
     return null;
   }
 }
@@ -175,7 +174,7 @@ export function transformPRData(rawData: any): PRDetails {
  * ```typescript
  * const prDetails = await getPRDetails('owner', 'repo', '123');
  * if (prDetails) {
- *   console.log('Figma URLs:', prDetails.figmaUrls);
+ *   // Access Figma URLs
  * }
  * ```
  */

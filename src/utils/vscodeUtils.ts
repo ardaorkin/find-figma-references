@@ -9,7 +9,7 @@ import * as vscode from "vscode";
  * ```typescript
  * const filePath = getCurrentFilePath();
  * if (filePath) {
- *   console.log('Current file:', filePath);
+ *   // Use file path
  * }
  * ```
  */
@@ -129,7 +129,7 @@ export function isValidFilePath(filePath: string): boolean {
  * ```typescript
  * const workspace = getWorkspaceFolder('/path/to/file.ts');
  * if (workspace) {
- *   console.log('Workspace:', workspace.name);
+ *   // Use workspace
  * }
  * ```
  */

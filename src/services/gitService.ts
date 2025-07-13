@@ -48,7 +48,6 @@ export async function executeGitLog(params: GitLogParams): Promise<string> {
 
     return stdout;
   } catch (error) {
-    console.error("[Git Service] Error executing git log:", error);
     throw new Error(`Failed to execute git log: ${error}`);
   }
 }
@@ -73,7 +72,6 @@ export async function getRemoteUrl(params: RemoteUrlParams): Promise<string> {
 
     return stdout.trim();
   } catch (error) {
-    console.error("[Git Service] Error getting remote URL:", error);
     return "";
   }
 }
@@ -194,7 +192,7 @@ export function processCommitWithPR(
  * ```typescript
  * const commits = await getGitHistory('/path/to/file.ts');
  * for (const commit of commits) {
- *   console.log(`Commit ${commit.shortHash} by ${commit.author}`);
+ *   // Process commit data
  * }
  * ```
  */

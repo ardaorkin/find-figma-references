@@ -44,7 +44,6 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     this._view = webviewView;
 
     if (!this._extensionUri) {
-      console.error("Extension URI not set");
       return;
     }
 
@@ -348,7 +347,6 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
       const htmlContent = fs.readFileSync(htmlPath, "utf8");
       return htmlContent;
     } catch (error) {
-      console.error("Failed to read webview HTML file:", error);
       return this._getFallbackHtml();
     }
   }
