@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.6] - 2024-07-13
+### Changed
+- Updated extension icon for better visual identification.
+
 ## [0.0.5] - 2024-07-13
 ### Added
 - Extension icon for better visual identification in the Activity Bar.
