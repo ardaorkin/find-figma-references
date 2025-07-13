@@ -109,19 +109,37 @@ find-figma-references/
 │   ├── services/          # Core business logic
 │   │   ├── gitService.ts
 │   │   ├── githubService.ts
-│   │   └── figmaReferenceService.ts
+│   │   ├── figmaReferenceService.ts
+│   │   ├── gitService.test.ts
+│   │   ├── githubService.test.ts
+│   │   └── figmaReferenceService.test.ts
 │   ├── utils/             # Utility functions
 │   │   ├── urlDetection.ts
-│   │   └── vscodeUtils.ts
+│   │   ├── vscodeUtils.ts
+│   │   ├── settingsUtils.ts
+│   │   ├── urlDetection.test.ts
+│   │   └── vscodeUtils.test.ts
 │   ├── ui/                # User interface
 │   │   ├── figmaReferenceProvider.ts
 │   │   └── webview.html
 │   ├── types/             # TypeScript type definitions
 │   │   └── index.ts
-│   └── extension.ts       # Main extension entry point
-├── assets/                # Extension assets
-│   └── icon.svg
-├── tests/                 # Test files
+│   ├── extension.ts       # Main extension entry point
+│   └── extension.test.ts  # Extension tests
+├── resources/             # Extension assets
+│   ├── icon.svg
+│   └── icon-dark.svg
+├── scripts/               # Build and development scripts
+│   ├── build-with-esbuild.ts
+│   ├── esbuild.config.ts
+│   └── watch-with-esbuild.ts
+├── mocks/                 # VSCode API mocks for testing
+│   └── vscode.ts
+├── dist/                  # Built extension files
+│   ├── extension.cjs
+│   └── ui/
+│       └── webview.html
+├── tests/                 # Test files (co-located with source)
 └── package.json
 ```
 
