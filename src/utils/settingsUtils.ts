@@ -13,7 +13,11 @@ import * as vscode from "vscode";
  */
 export async function saveGitHubToken(token: string): Promise<void> {
   const config = vscode.workspace.getConfiguration();
-  await config.update("github.token", token, vscode.ConfigurationTarget.Global);
+  await config.update(
+    "figmaReferences.githubToken",
+    token,
+    vscode.ConfigurationTarget.Global
+  );
 }
 
 /**
@@ -31,7 +35,7 @@ export async function saveGitHubToken(token: string): Promise<void> {
  */
 export function getGitHubTokenFromSettings(): string | null {
   const config = vscode.workspace.getConfiguration();
-  const token = config.get("github.token") as string;
+  const token = config.get("figmaReferences.githubToken") as string;
   return token || null;
 }
 

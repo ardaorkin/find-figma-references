@@ -66,10 +66,10 @@
     "configuration": {
       "title": "Figma References",
       "properties": {
-        "github.token": {
+        "figmaReferences.githubToken": {
           "type": "string",
           "default": "",
-          "description": "GitHub Personal Access Token for accessing pull request data",
+          "description": "GitHub Personal Access Token for accessing pull request data to find Figma references",
           "scope": "application"
         }
       }

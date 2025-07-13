@@ -178,7 +178,7 @@ export async function getPRDetails(
   const token = getGitHubToken();
   if (!token) {
     throw new Error(
-      "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure github.token in VSCode settings."
+      "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure figmaReferences.githubToken in VSCode settings."
     );
   }
 
