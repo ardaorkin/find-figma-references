@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.7] - 2024-07-13
+### Changed
+- Updated extension icon for better visual identification.
+
 ## [0.0.6] - 2024-07-13
 ### Changed
 - Updated extension icon for better visual identification.
