@@ -2,37 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.2] - 2024-07-13
+## [Unreleased]
+
+## [0.0.3] - 2024-01-XX
 
 ### Added
-- **Performance Improvements**: Chunked processing for better performance with large git histories
-- **Streaming Results**: Results appear immediately as they're found, no need to wait for all processing
-- **Progress Indicator**: Real-time progress bar showing processing status
-- **Responsive Design**: History cards now properly handle narrow containers without text overflow
-- **UI Priority**: Figma links are now prominently displayed at the top of each card
-- **Visual Hierarchy**: Clear separation between Figma URLs and GitHub PR information
+- **GitHub Token UI**: Built-in token input in the extension panel
+- **Configuration Management**: Extension-specific configuration name (`figmaReferences.githubToken`)
+- **Token Validation**: Proper validation of GitHub token format
+- **Auto-refresh**: Automatic refresh after token is successfully saved
+- **Enhanced UX**: Token input appears when needed, disappears when configured
 
 ### Changed
-- **UI Layout**: Reorganized history cards to prioritize Figma links over GitHub PR links
-- **Loading States**: Persistent loading indicator that remains until all processing is complete
-- **Text Wrapping**: Improved URL and text handling for responsive layouts
-- **Error Handling**: Cleaner error handling without debug console output
+- **Configuration Name**: Changed from generic `github.token` to `figmaReferences.githubToken`
+- **Error Handling**: Improved error messages and token-related error detection
+- **Loading Behavior**: Prevents loading indicator when GitHub token is missing
 
 ### Fixed
-- **Responsive Layout**: Fixed text overflow issues in narrow Activity Bar panels
-- **URL Display**: Long URLs now wrap properly without breaking layout
-- **Header Layout**: Responsive header that adapts to different panel widths
-- **Production Code**: Removed all console logs for clean production deployment
+- **Token Input Persistence**: Token input now properly disappears after successful save
+- **Configuration Conflicts**: Eliminates potential conflicts with other extensions
 
-### Technical
-- **Chunked Processing**: Commits processed in batches of 5 with 100ms delays
-- **Streaming Architecture**: Callback-based result streaming for immediate feedback
-- **Progress Tracking**: Real-time progress updates during processing
-- **Code Quality**: Comprehensive test coverage maintained at 100%
+## [0.0.2] - 2024-01-XX
 
-## [0.0.1]
+### Added
+- **Performance Improvements**: Chunked processing and streaming results
+- **Progress Tracking**: Real-time progress bar during processing
+- **Responsive Design**: Fixed text overflow in narrow containers
+
+### Changed
+- **UI Enhancements**: Figma links prioritized over GitHub PR links
+- **Code Quality**: Removed all console logs for production readiness
+
+## [0.0.1] - 2024-01-XX
 
 ### Added
 - Initial release
