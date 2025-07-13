@@ -4,6 +4,7 @@ import * as fs from "fs";
 import type { FigmaReferenceResult } from "../types";
 import { getCurrentFilePath } from "../utils/vscodeUtils";
 import { findFigmaReferences } from "../services/figmaReferenceService";
+import { saveGitHubToken, hasGitHubToken } from "../utils/settingsUtils";
 
 /**
  * Provider for the Figma References Webview
@@ -68,10 +69,16 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     await this.refresh();
 
     // Handle messages from the webview
-    webviewView.webview.onDidReceiveMessage((message) => {
+    webviewView.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
         case "refresh":
           this.refresh();
+          break;
+        case "saveGitHubToken":
+          await this.saveGitHubToken(message.token);
+          break;
+        case "checkGitHubToken":
+          this.checkGitHubToken();
           break;
       }
     });
@@ -299,6 +306,71 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
       this._view.webview.postMessage({
         command: "showNoResults",
         message: message,
+      });
+    }
+  }
+
+  /**
+   * Saves the GitHub token to VSCode settings
+   *
+   * @param token - The GitHub token to save
+   * @returns Promise that resolves when the token is saved
+   *
+   * @example
+   * ```typescript
+   * await provider.saveGitHubToken('ghp_...');
+   * ```
+   */
+  public async saveGitHubToken(token: string): Promise<void> {
+    try {
+      await saveGitHubToken(token);
+      if (this._view) {
+        this._view.webview.postMessage({
+          command: "tokenSaved",
+          success: true,
+        });
+      }
+    } catch (error) {
+      if (this._view) {
+        this._view.webview.postMessage({
+          command: "tokenSaved",
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  }
+
+  /**
+   * Checks if a GitHub token is configured and notifies the webview
+   *
+   * @example
+   * ```typescript
+   * provider.checkGitHubToken();
+   * ```
+   */
+  public checkGitHubToken(): void {
+    const hasToken = hasGitHubToken();
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "tokenStatus",
+        hasToken: hasToken,
+      });
+    }
+  }
+
+  /**
+   * Shows the token input section in the webview
+   *
+   * @example
+   * ```typescript
+   * provider.showTokenInput();
+   * ```
+   */
+  public showTokenInput(): void {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "showTokenInput",
       });
     }
   }

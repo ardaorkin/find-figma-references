@@ -60,9 +60,8 @@ async function handleFindFigmaReferences(
       errorMessage.includes("GitHub token not found") ||
       errorMessage.includes("GITHUB_TOKEN")
     ) {
-      provider.showError(
-        "GitHub token not found. Please set GITHUB_TOKEN environment variable or configure github.token in VSCode settings."
-      );
+      // Show token input instead of error message
+      provider.showTokenInput();
     } else {
       provider.showError(`Error finding Figma references: ${errorMessage}`);
     }

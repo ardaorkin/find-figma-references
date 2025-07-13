@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { Octokit } from "octokit";
 import type { PRDetails } from "../types";
 import { findFigmaUrls, findJiraUrls } from "../utils/urlDetection";
+import { getGitHubTokenFromSettings } from "../utils/settingsUtils";
 
 /**
  * Configuration for GitHub API requests
@@ -40,9 +41,7 @@ interface FetchPRParams {
  */
 export function getGitHubToken(): string | null {
   const envToken = process.env.GITHUB_TOKEN;
-  const configToken = vscode.workspace
-    .getConfiguration()
-    .get("github.token") as string;
+  const configToken = getGitHubTokenFromSettings();
 
   const token = envToken || configToken;
 

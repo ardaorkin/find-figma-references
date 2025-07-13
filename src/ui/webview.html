@@ -185,6 +185,92 @@
             transition: width 0.3s ease;
         }
 
+        .token-section {
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .token-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 1em;
+            color: var(--vscode-editor-foreground);
+        }
+
+        .token-section p {
+            margin: 0 0 12px 0;
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            line-height: 1.4;
+        }
+
+        .token-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 3px;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
+            box-sizing: border-box;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .token-input::placeholder {
+            color: var(--vscode-input-placeholderForeground);
+        }
+
+        .save-token-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: 1px solid var(--vscode-button-border);
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .save-token-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .save-token-btn:disabled {
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            cursor: not-allowed;
+        }
+
+        .token-status {
+            margin-top: 8px;
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        .token-status.success {
+            background-color: var(--vscode-notificationsInfoBackground);
+            color: var(--vscode-notificationsInfoForeground);
+        }
+
+        .token-status.error {
+            background-color: var(--vscode-notificationsErrorBackground);
+            color: var(--vscode-notificationsErrorForeground);
+        }
+
+        .token-status.info {
+            background-color: var(--vscode-notificationsWarningBackground);
+            color: var(--vscode-notificationsWarningForeground);
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -202,6 +288,16 @@
         <div class="header">
             <div class="title">Figma References</div>
             <button class="refresh-btn" onclick="refreshResults()">Refresh</button>
+        </div>
+
+        <div id="token-section" class="token-section" style="display: none;">
+            <h3>GitHub Token</h3>
+            <p>Enter your GitHub Personal Access Token to access pull request data. If you add a token using this input,
+                it will be saved in VSCode settings.</p>
+            <input type="password" id="token-input" class="token-input"
+                placeholder="Enter your GitHub token (ghp_...)" />
+            <button id="save-token-btn" class="save-token-btn" onclick="saveToken()">Save Token</button>
+            <div id="token-status"></div>
         </div>
 
         <div id="content">
@@ -245,7 +341,21 @@
                 case 'showNoResults':
                     showNoResults(message.message);
                     break;
+                case 'tokenSaved':
+                    handleTokenSaved(message.success, message.error);
+                    break;
+                case 'tokenStatus':
+                    handleTokenStatus(message.hasToken);
+                    break;
+                case 'showTokenInput':
+                    showTokenInput();
+                    break;
             }
+        });
+
+        // Check token status on page load
+        vscode.postMessage({
+            command: 'checkGitHubToken'
         });
 
         function showResults(results, fileName) {
@@ -444,6 +554,87 @@
             vscode.postMessage({
                 command: 'refresh'
             });
+        }
+
+        function saveToken() {
+            const tokenInput = document.getElementById('token-input');
+            const saveBtn = document.getElementById('save-token-btn');
+            const tokenStatus = document.getElementById('token-status');
+
+            const token = tokenInput.value.trim();
+
+            if (!token) {
+                showTokenStatus('Please enter a GitHub token', 'error');
+                return;
+            }
+
+            if (!token.startsWith('ghp_')) {
+                showTokenStatus('Token should start with "ghp_"', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            showTokenStatus('Saving token...', 'info');
+
+            vscode.postMessage({
+                command: 'saveGitHubToken',
+                token: token
+            });
+        }
+
+        function handleTokenSaved(success, error) {
+            const saveBtn = document.getElementById('save-token-btn');
+            const tokenInput = document.getElementById('token-input');
+
+            // Re-enable button
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Token';
+
+            if (success) {
+                showTokenStatus('Token saved successfully!', 'success');
+                tokenInput.value = '';
+                // Hide token section after successful save
+                setTimeout(() => {
+                    document.getElementById('token-section').style.display = 'none';
+                }, 2000);
+            } else {
+                showTokenStatus('Failed to save token: ' + error, 'error');
+            }
+        }
+
+        function handleTokenStatus(hasToken) {
+            const tokenSection = document.getElementById('token-section');
+
+            if (hasToken) {
+                // Token is configured, hide the section
+                tokenSection.style.display = 'none';
+            } else {
+                // No token configured, show the section
+                tokenSection.style.display = 'block';
+            }
+        }
+
+        function showTokenStatus(message, type) {
+            const tokenStatus = document.getElementById('token-status');
+            tokenStatus.textContent = message;
+            tokenStatus.className = 'token-status ' + type;
+        }
+
+        function showTokenInput() {
+            const tokenSection = document.getElementById('token-section');
+            const content = document.getElementById('content');
+
+            // Show token section
+            tokenSection.style.display = 'block';
+
+            // Clear content and show message
+            content.innerHTML = `
+                <div class="no-results">
+                    <p>GitHub token is required to access pull request data. Please enter your token above.</p>
+                </div>
+            `;
         }
     </script>
 </body>
