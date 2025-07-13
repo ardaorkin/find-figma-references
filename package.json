@@ -62,6 +62,17 @@
           "type": "webview"
         }
       ]
+    },
+    "configuration": {
+      "title": "Figma References",
+      "properties": {
+        "github.token": {
+          "type": "string",
+          "default": "",
+          "description": "GitHub Personal Access Token for accessing pull request data",
+          "scope": "application"
+        }
+      }
     }
   },
   "engines": {
