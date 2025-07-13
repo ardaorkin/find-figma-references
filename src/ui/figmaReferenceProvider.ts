@@ -448,18 +448,22 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     webview: vscode.Webview,
     extensionUri: vscode.Uri
   ): string {
-    const htmlPath = path.join(
-      extensionUri.fsPath,
-      "src",
-      "ui",
-      "webview.html"
-    );
+    // Try to read from dist folder first (for packaged extension)
+    let htmlPath = path.join(extensionUri.fsPath, "dist", "ui", "webview.html");
 
     try {
       const htmlContent = fs.readFileSync(htmlPath, "utf8");
       return htmlContent;
     } catch (error) {
-      return this._getFallbackHtml();
+      // Fallback to src folder (for development)
+      htmlPath = path.join(extensionUri.fsPath, "src", "ui", "webview.html");
+
+      try {
+        const htmlContent = fs.readFileSync(htmlPath, "utf8");
+        return htmlContent;
+      } catch (error) {
+        return this._getFallbackHtml();
+      }
     }
   }
 
