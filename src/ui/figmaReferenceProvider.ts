@@ -99,6 +99,8 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
           return;
         }
 
+        // Hide token input if it's showing (we have a token now)
+        this.hideTokenInput();
         this.showLoading(fileName);
 
         const results = await findFigmaReferences({
@@ -393,6 +395,22 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     if (this._view) {
       this._view.webview.postMessage({
         command: "showTokenInput",
+      });
+    }
+  }
+
+  /**
+   * Hides the token input section in the webview
+   *
+   * @example
+   * ```typescript
+   * provider.hideTokenInput();
+   * ```
+   */
+  public hideTokenInput(): void {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "hideTokenInput",
       });
     }
   }

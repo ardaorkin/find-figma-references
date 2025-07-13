@@ -350,6 +350,9 @@
                 case 'showTokenInput':
                     showTokenInput();
                     break;
+                case 'hideTokenInput':
+                    hideTokenInput();
+                    break;
             }
         });
 
@@ -632,6 +635,11 @@
                     <p>GitHub token is required to access pull request data. Please enter your token above.</p>
                 </div>
             `;
+        }
+
+        function hideTokenInput() {
+            const tokenSection = document.getElementById('token-section');
+            tokenSection.style.display = 'none';
         }
     </script>
 </body>
