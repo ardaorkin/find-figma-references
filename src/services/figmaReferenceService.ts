@@ -260,6 +260,11 @@ export async function findFigmaReferences(
 
     return results;
   } catch (error) {
-    throw new Error(`Failed to find Figma references: ${error}`);
+    // Preserve the original error message for proper error handling
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error(`Failed to find Figma references: ${error}`);
+    }
   }
 }
