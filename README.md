@@ -9,15 +9,33 @@ A VSCode extension that automatically finds Figma references in GitHub pull requ
 - Supports both `figma.com` and `figma.dev` URLs
 - Filters results to only show PRs that contain Figma references
 
+### ⚡ **High Performance**
+- **Chunked Processing**: Efficiently processes large git histories in batches
+- **Streaming Results**: Results appear immediately as they're found
+- **Progress Tracking**: Real-time progress bar shows processing status
+- **Persistent Loading**: Loading indicator remains until all processing is complete
+
 ### 🖥️ **Activity Bar Integration**
 - Dedicated panel in the VSCode Activity Bar with custom icon
 - Real-time updates when switching between files
 - Minimalistic, clean UI that fits seamlessly with VSCode's design
 
+### 📱 **Responsive Design**
+- **Adaptive Layout**: Works perfectly in narrow Activity Bar panels
+- **Smart Text Wrapping**: URLs and text wrap properly without overflow
+- **Flexible Header**: Header adapts to different panel widths
+- **Mobile-Friendly**: Optimized for various screen sizes
+
 ### 📁 **File-Aware Results**
 - Shows results specific to the currently open file
 - Displays file name in loading and results messages
 - Automatically refreshes when switching files
+
+### 🎨 **Enhanced UI/UX**
+- **Figma-First Design**: Figma links prominently displayed at the top
+- **Visual Hierarchy**: Clear separation between Figma URLs and GitHub PR info
+- **Clean Layout**: Organized card design with proper spacing
+- **Theme Integration**: Adapts to VSCode's light/dark themes
 
 ### 🔄 **Easy Refresh**
 - Tertiary refresh button for manual updates
@@ -54,9 +72,11 @@ npm run package
 
 ### Understanding Results
 Each result shows:
+- **Figma URLs**: All Figma links found in the PR description (prominently displayed at the top)
 - **Pull Request URL**: Direct link to the GitHub PR
 - **Author**: Who created the pull request
-- **Figma URLs**: All Figma links found in the PR description
+
+The layout prioritizes Figma links since they're the primary purpose of this extension, making it easy to quickly identify and access design references.
 
 ## Requirements
 
@@ -128,6 +148,12 @@ npm run test:watch
 
 ## Features in Detail
 
+### Performance Architecture
+- **Chunked Processing**: Processes commits in batches of 5 with 100ms delays to prevent API rate limiting
+- **Streaming Results**: Uses callback-based architecture for immediate result display
+- **Progress Tracking**: Real-time progress updates with visual progress bar
+- **Efficient Caching**: Optimized to minimize redundant API calls
+
 ### URL Detection
 The extension recognizes various Figma URL formats:
 - `https://figma.com/file/...`
@@ -139,12 +165,14 @@ The extension recognizes various Figma URL formats:
 - Scans git log for commits that reference the current file
 - Extracts pull request information from commit messages
 - Handles both direct commits and merge commits
+- Efficient processing of large git histories
 
 ### UI/UX Design
 - **Minimalistic Design**: Clean, focused interface
 - **Theme Integration**: Adapts to VSCode's light/dark themes
-- **Responsive Layout**: Optimized for Activity Bar panel
-- **Loading States**: Clear feedback with file-specific messages
+- **Responsive Layout**: Optimized for Activity Bar panel with proper text wrapping
+- **Loading States**: Clear feedback with file-specific messages and progress indicators
+- **Figma-First Layout**: Prioritizes Figma links for better user experience
 
 ## Contributing
 
@@ -183,6 +211,13 @@ The extension recognizes various Figma URL formats:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
+
+### v0.0.2 (Unreleased)
+- **Performance Improvements**: Chunked processing and streaming results
+- **Responsive Design**: Fixed text overflow in narrow containers
+- **UI Enhancements**: Figma links prioritized over GitHub PR links
+- **Progress Tracking**: Real-time progress bar during processing
+- **Code Quality**: Removed all console logs for production readiness
 
 ### v0.0.1
 - Initial release
