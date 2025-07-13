@@ -92,6 +92,13 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     if (filePath) {
       try {
         const fileName = filePath.split("/").pop() || filePath;
+
+        // Check if we have a GitHub token before showing loading
+        if (!hasGitHubToken()) {
+          this.showTokenInput();
+          return;
+        }
+
         this.showLoading(fileName);
 
         const results = await findFigmaReferences({
@@ -113,7 +120,18 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
           this.showNoResults("No Figma references found for this file");
         }
       } catch (error) {
-        this.showError(`Error finding Figma references: ${error}`);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+
+        // Check if the error is related to missing GitHub token
+        if (
+          errorMessage.includes("GitHub token not found") ||
+          errorMessage.includes("GITHUB_TOKEN")
+        ) {
+          this.showTokenInput();
+        } else {
+          this.showError(`Error finding Figma references: ${errorMessage}`);
+        }
       }
     } else {
       this.showNoResults("No file is currently open");

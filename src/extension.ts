@@ -54,17 +54,7 @@ async function handleFindFigmaReferences(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-
-    // Check if the error is related to missing GitHub token
-    if (
-      errorMessage.includes("GitHub token not found") ||
-      errorMessage.includes("GITHUB_TOKEN")
-    ) {
-      // Show token input instead of error message
-      provider.showTokenInput();
-    } else {
-      provider.showError(`Error finding Figma references: ${errorMessage}`);
-    }
+    provider.showError(`Error finding Figma references: ${errorMessage}`);
   }
 }
 
