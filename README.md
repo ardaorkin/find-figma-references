@@ -176,6 +176,8 @@ npm run test:watch
 The extension recognizes various Figma URL formats:
 - `https://figma.com/file/...`
 - `https://www.figma.com/file/...`
+- `https://figma.com/design/...`
+- `https://www.figma.com/design/...`
 - `https://figma.dev/file/...`
 - `https://www.figma.dev/file/...`
 
