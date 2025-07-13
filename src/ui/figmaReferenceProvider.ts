@@ -85,12 +85,26 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
     const filePath = getCurrentFilePath();
     if (filePath) {
       try {
-        const results = await findFigmaReferences({ filePath });
         const fileName = filePath.split("/").pop() || filePath;
+        this.showLoading(fileName);
+
+        const results = await findFigmaReferences({
+          filePath,
+          onResultFound: (result) => {
+            // Stream results as they're found
+            this.addResult(result, fileName);
+          },
+          onProgress: (processed, total) => {
+            // Update progress indicator
+            this.updateProgress(processed, total);
+          },
+        });
+
+        // Remove loading state and show final results
+        this.finishLoading(fileName);
+
         if (results.length === 0) {
           this.showNoResults("No Figma references found for this file");
-        } else {
-          this.updateContent(results, fileName);
         }
       } catch (error) {
         this.showError(`Error finding Figma references: ${error}`);
@@ -167,6 +181,68 @@ export class FigmaReferenceProvider implements vscode.WebviewViewProvider {
       this._view.webview.postMessage({
         command: "updateResults",
         results: results,
+        fileName: fileName || "this file",
+      });
+    }
+  }
+
+  /**
+   * Adds a single result to the existing results in the webview
+   *
+   * @param result - Single Figma reference result to add
+   * @param fileName - The name of the current file
+   *
+   * @example
+   * ```typescript
+   * const result = { prUrl: "...", author: "John", figmaUrls: ["..."] };
+   * provider.addResult(result, "src/components/Button.tsx");
+   * ```
+   */
+  public addResult(result: FigmaReferenceResult, fileName?: string): void {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "addResult",
+        result: result,
+        fileName: fileName || "this file",
+      });
+    }
+  }
+
+  /**
+   * Updates the progress indicator in the webview
+   *
+   * @param processed - Number of commits processed
+   * @param total - Total number of commits to process
+   *
+   * @example
+   * ```typescript
+   * provider.updateProgress(10, 50); // 20% complete
+   * ```
+   */
+  public updateProgress(processed: number, total: number): void {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "updateProgress",
+        processed: processed,
+        total: total,
+      });
+    }
+  }
+
+  /**
+   * Removes the loading state and shows final results
+   *
+   * @param fileName - The name of the current file
+   *
+   * @example
+   * ```typescript
+   * provider.finishLoading("Button.tsx");
+   * ```
+   */
+  public finishLoading(fileName?: string): void {
+    if (this._view) {
+      this._view.webview.postMessage({
+        command: "finishLoading",
         fileName: fileName || "this file",
       });
     }
