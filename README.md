@@ -212,7 +212,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### v0.0.3 (Latest)
+### v0.0.4 (Latest)
+- **Fixed Webview HTML Packaging**: Token input UI now works in packaged VSIX
+- **Improved Build Process**: Webview HTML is properly included in the extension package
+- **Better File Resolution**: Extension correctly finds HTML file in both development and production
+
+### v0.0.3
 - **GitHub Token UI**: Added built-in token input in the extension panel
 - **Configuration Management**: Extension-specific configuration name (`figmaReferences.githubToken`)
 - **Improved Error Handling**: Better error messages and token validation

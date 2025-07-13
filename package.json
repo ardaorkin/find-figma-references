@@ -24,7 +24,7 @@
   },
   "//": "START EXTENSION ATTRIBUTES",
   "name": "find-figma-references",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Find Figma references in GitHub PRs for the current file",
   "displayName": "Figma References",
   "repository": {
