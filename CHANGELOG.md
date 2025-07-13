@@ -1,51 +1,28 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.0.4] - 2024-01-XX
-
+## [0.0.4] - 2024-07-13
 ### Fixed
-- **Webview HTML Packaging**: Fixed missing token input UI in packaged VSIX
-- **Build Process**: Updated build script to include webview HTML in dist folder
-- **File Path Resolution**: Extension now correctly finds HTML file in both development and packaged modes
+- Webview HTML is now included in the VSIX package, so the token input UI works in production builds.
+- Improved build and packaging scripts to ensure all necessary files are distributed.
+- File path resolution for webview HTML works in both development and packaged extension modes.
 
-## [0.0.3] - 2024-01-XX
-
+## [0.0.3] - 2024-07-13
 ### Added
-- **GitHub Token UI**: Built-in token input in the extension panel
-- **Configuration Management**: Extension-specific configuration name (`figmaReferences.githubToken`)
-- **Token Validation**: Proper validation of GitHub token format
-- **Auto-refresh**: Automatic refresh after token is successfully saved
-- **Enhanced UX**: Token input appears when needed, disappears when configured
-
+- Built-in GitHub token input UI in the extension panel.
+- Extension-specific configuration: `figmaReferences.githubToken`.
+- Auto-refresh after saving a token.
 ### Changed
-- **Configuration Name**: Changed from generic `github.token` to `figmaReferences.githubToken`
-- **Error Handling**: Improved error messages and token-related error detection
-- **Loading Behavior**: Prevents loading indicator when GitHub token is missing
+- Improved error handling and token validation.
+- Token input appears only when needed and disappears after configuration.
 
-### Fixed
-- **Token Input Persistence**: Token input now properly disappears after successful save
-- **Configuration Conflicts**: Eliminates potential conflicts with other extensions
-
-## [0.0.2] - 2024-01-XX
-
+## [0.0.2] - 2024-07-13
 ### Added
-- **Performance Improvements**: Chunked processing and streaming results
-- **Progress Tracking**: Real-time progress bar during processing
-- **Responsive Design**: Fixed text overflow in narrow containers
-
+- Performance improvements: chunked processing and streaming results.
+- Real-time progress bar and responsive design fixes.
 ### Changed
-- **UI Enhancements**: Figma links prioritized over GitHub PR links
-- **Code Quality**: Removed all console logs for production readiness
+- UI prioritizes Figma links over PR links.
+- Removed all console logs for production readiness.
 
-## [0.0.1] - 2024-01-XX
-
+## [0.0.1] - 2024-07-13
 ### Added
-- Initial release
-- Basic Figma URL detection
-- Activity Bar integration
-- File-aware results display
-- Minimalistic UI design
+- Initial release with Figma URL detection, Activity Bar integration, and minimalistic UI.
