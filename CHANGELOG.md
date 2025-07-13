@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.5] - 2024-07-13
+### Added
+- Extension icon for better visual identification in the Activity Bar.
+- Support for `figma.com/design` URL format in documentation.
+- MIT License file for proper open source licensing.
+
+### Changed
+- Updated README project structure to accurately reflect the current codebase organization.
+- Improved VSIX packaging configuration for better distribution.
+
 ## [0.0.4] - 2024-07-13
 ### Fixed
 - Webview HTML is now included in the VSIX package, so the token input UI works in production builds.
