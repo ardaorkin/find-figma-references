@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.8] - 2024-07-13
+### Changed
+- Configure theme-specific activity bar icons for light and dark themes.
+
 ## [0.0.7] - 2024-07-13
 ### Added
 - Theme-specific icons: light and dark theme support for better visual integration.
