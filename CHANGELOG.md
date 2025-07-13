@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.10] - 2024-07-13
+### Changed
+- Improved activity bar icon with better scaling and cleaner SVG structure.
+- Removed unused icon files to clean up the extension package.
+
 ## [0.0.9] - 2024-07-13
 ### Changed
 - Updated activity bar icon to use SVG format for better scaling and theme integration.
