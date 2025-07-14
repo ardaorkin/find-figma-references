@@ -35,7 +35,7 @@ describe("extension", () => {
       const callback = (vscode.commands.registerCommand as any).mock
         .calls[0][1] as Function;
 
-      expect(command).toEqual("bun-vscode-extension.find-figma-references");
+      expect(command).toEqual("find-figma-references.find-figma-references");
       expect(typeof callback).toBe("function");
     });
 
