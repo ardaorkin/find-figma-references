@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.0.11] - 2024-07-13
+### Fixed
+- Running "Find Figma references" from the Command Palette now automatically opens and focuses the Figma References activity bar view, so users immediately see results without manually opening the panel.
+
 ## [0.0.10] - 2024-07-13
 ### Changed
 - Improved activity bar icon with better scaling and cleaner SVG structure.

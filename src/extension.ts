@@ -29,6 +29,11 @@ async function handleFindFigmaReferences(
     return;
   }
 
+  // Focus the Figma References activity bar view
+  await vscode.commands.executeCommand(
+    "workbench.view.extension.figma-references"
+  );
+
   // Show loading state
   const fileName = currentFilePath.split("/").pop() || currentFilePath;
   provider.showLoading(fileName);
@@ -86,7 +91,7 @@ export const activate = (context: vscode.ExtensionContext) => {
 
   // Register the command to find Figma references
   const commandDisposable = vscode.commands.registerCommand(
-    "bun-vscode-extension.find-figma-references",
+    "find-figma-references.find-figma-references",
     () => handleFindFigmaReferences(provider)
   );
 
